@@ -111,7 +111,10 @@ class DockerAdapter:
 
     def startContainer(self, wrk_data: dict) -> str:
         try:
-            # self.__client.images.pull(repository=wrk_data[model.Worker.image])
+            try:
+                self.__client.images.pull(repository=dep_data[model.Deployment.image])
+            except Exception as ex:
+                logger.warning("can't pull image for '{}' - {}".format(dep_data[model.Deployment.id], ex))
             params = dict()
             params["name"] = uuid.uuid4().hex
             params["labels"] = {
