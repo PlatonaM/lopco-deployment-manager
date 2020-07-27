@@ -128,6 +128,7 @@ class DockerAdapter:
                 params["environment"].update(wrk_data[model.Worker.configs])
             if wrk_data.get(model.Worker.inputs):
                 params["environment"].update(wrk_data[model.Worker.inputs])
+            params["environment"] = {"DEP_INSTANCE": params["name"]}
             self.__client.containers.run(**params)
             return params["name"]
         except Exception as ex:
