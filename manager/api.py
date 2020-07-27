@@ -65,11 +65,11 @@ class Deployment:
     def __init__(self, docker_adapter: DockerAdapter):
         self.__docker_adapter = docker_adapter
 
-    def on_get(self, req: falcon.request.Request, resp: falcon.response.Response, worker):
+    def on_get(self, req: falcon.request.Request, resp: falcon.response.Response, deployment):
         reqDebugLog(req)
         try:
             resp.content_type = falcon.MEDIA_JSON
-            resp.body = json.dumps(self.__docker_adapter.getContainer(worker))
+            resp.body = json.dumps(self.__docker_adapter.getContainer(deployment))
             resp.status = falcon.HTTP_200
         except NotFound as ex:
             resp.status = falcon.HTTP_404
@@ -78,11 +78,11 @@ class Deployment:
             resp.status = falcon.HTTP_500
             reqErrorLog(req, ex)
 
-    def on_delete(self, req: falcon.request.Request, resp: falcon.response.Response, worker):
+    def on_delete(self, req: falcon.request.Request, resp: falcon.response.Response, deployment):
         reqDebugLog(req)
         try:
-            self.__docker_adapter.stopContainer(worker)
-            self.__docker_adapter.removeContainer(worker)
+            self.__docker_adapter.stopContainer(deployment)
+            self.__docker_adapter.removeContainer(deployment)
             resp.status = falcon.HTTP_200
         except NotFound as ex:
             resp.status = falcon.HTTP_404
