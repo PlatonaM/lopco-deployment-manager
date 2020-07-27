@@ -14,15 +14,31 @@
    limitations under the License.
 """
 
-__all__ = ("Worker", )
+__all__ = ("Deployment", "Worker", "ProtocolAdapter", "Port", "DepTypes")
 
 
-
-class Worker:
+class Deployment:
     id = "id"
-    name = "name"
     image = "image"
     data_cache_path = "data_cache_path"
-    inputs = "inputs"
     configs = "configs"
+    type = "type"
 
+
+class Worker(Deployment):
+    inputs = "inputs"
+
+
+class ProtocolAdapter(Deployment):
+    ports = "ports"
+
+
+class Port:
+    protocol = "protocol"
+    host_interface = "host_interface"
+    host_ports = "host_ports"
+
+
+class DepTypes:
+    worker = "worker"
+    protocol_adapter = "protocol-adapter"
