@@ -30,8 +30,8 @@ app = falcon.API()
 app.req_options.strip_url_path_trailing_slash = True
 
 routes = (
-    ("/workers", api.Workers(docker_adapter)),
-    ("/workers/{worker}", api.Worker(docker_adapter))
+    ("/deployments", api.Deployments(docker_adapter)),
+    ("/deployments/{deployment}", api.Deployment(docker_adapter))
 )
 
 for route in routes:
