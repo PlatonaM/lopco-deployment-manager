@@ -42,9 +42,14 @@ class NotFound(CEAdapterError):
     pass
 
 
+class ImageNotFound(CEAdapterError):
+    pass
+
+
 error_map = {
     docker.errors.APIError: EngineAPIError,
-    docker.errors.NotFound: NotFound
+    docker.errors.NotFound: NotFound,
+    docker.errors.ImageNotFound: ImageNotFound
 }
 
 
