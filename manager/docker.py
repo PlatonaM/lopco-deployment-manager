@@ -109,33 +109,36 @@ class DockerAdapter:
             logger.error("can't stop instance '{}' - {}".format(name, ex))
             raise error_map.setdefault(ex, CEAdapterError)(ex)
 
-    def startContainer(self, wrk_data: dict) -> str:
+    def startContainer(self, name, dep_data: dict, restart: bool = True, remove: bool = False) -> str:
         try:
             try:
                 self.__client.images.pull(repository=dep_data[model.Deployment.image])
             except Exception as ex:
                 logger.warning("can't pull image for '{}' - {}".format(dep_data[model.Deployment.id], ex))
             params = dict()
-            params["name"] = uuid.uuid4().hex
+            params["name"] = name
             params["labels"] = {
-                "worker-id": wrk_data[model.Worker.id],
-                "worker-name": wrk_data[model.Worker.name]
+                "lopco-type": dep_data[model.Deployment.type],
+                "lopco-id": dep_data[model.Deployment.id]
             }
             params["network"] = conf.Docker.network_name
-            params["image"] = wrk_data[model.Worker.image]
+            params["image"] = dep_data[model.Deployment.image]
             params["detach"] = True
-            params["remove"] = conf.Docker.rm_container
-            params["volumes"] = {conf.DataCache.volume_name: {"bind": wrk_data[model.Worker.data_cache_path], "mode": "rw"}}
-            params["environment"] = {"WORKER_INSTANCE": params["name"]}
-            if wrk_data.get(model.Worker.configs):
-                params["environment"].update(wrk_data[model.Worker.configs])
-            if wrk_data.get(model.Worker.inputs):
-                params["environment"].update(wrk_data[model.Worker.inputs])
+            params["remove"] = remove
+            params["volumes"] = {conf.DataCache.volume_name: {"bind": dep_data[model.Deployment.data_cache_path], "mode": "rw"}}
             params["environment"] = {"DEP_INSTANCE": params["name"]}
+            if dep_data.get(model.Deployment.configs):
+                params["environment"].update(dep_data[model.Deployment.configs])
+            if dep_data.get(model.Worker.inputs):
+                params["environment"].update(dep_data[model.Worker.inputs])
+            if dep_data.get(model.ProtocolAdapter.ports):
+                params["ports"] = {"{}/{}".format(port, val[model.Port.protocol]): (val[model.Port.host_interface], val[model.Port.host_ports]) if val.get(model.Port.host_interface) else val[model.Port.host_ports] for port, val in dep_data[model.ProtocolAdapter.ports].items()}
+            if restart:
+                params["restart_policy"] = {"name": "always"}
             self.__client.containers.run(**params)
             return params["name"]
         except Exception as ex:
-            logger.error("can't create instance for '{}' - {}".format(wrk_data[model.Worker.id], ex))
+            logger.error("can't create instance for '{}' - {}".format(dep_data[model.Deployment.id], ex))
             raise error_map.setdefault(ex, CEAdapterError)(ex)
 
     def removeContainer(self, name: str) -> None:
