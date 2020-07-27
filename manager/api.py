@@ -17,10 +17,13 @@
 __all__ = ("Deployments", "Deployment")
 
 
+from . import model
 from .logger import getLogger
 from .docker import DockerAdapter, NotFound
+from .configuration import conf
 import falcon
 import json
+import uuid
 
 
 logger = getLogger(__name__.split(".", 1)[-1])
@@ -54,8 +57,19 @@ class Deployments:
     def on_post(self, req: falcon.request.Request, resp: falcon.response.Response):
         reqDebugLog(req)
         try:
+            data = json.load(req.bounded_stream)
+            if data[model.Deployment.type] == model.DepTypes.worker:
+                resp.body = self.__docker_adapter.startContainer(
+                    name=str(uuid.uuid4()),
+                    dep_data=data,
+                    restart=False,
+                    remove=not conf.Docker.disable_rm
+                )
+            elif data[model.Deployment.type] == model.DepTypes.protocol_adapter:
+                resp.body = self.__docker_adapter.startContainer(name=data[model.Deployment.id], dep_data=data)
+            else:
+                raise Exception("unknown deployment type '{}'".format(data[model.Deployment.type]))
             resp.status = falcon.HTTP_200
-            resp.body = self.__docker_adapter.startContainer(json.load(req.bounded_stream))
         except Exception as ex:
             resp.status = falcon.HTTP_500
             reqErrorLog(req, ex)
