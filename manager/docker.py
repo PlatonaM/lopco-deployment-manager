@@ -67,9 +67,13 @@ class DockerAdapter:
         try:
             container = self.__client.containers.get(c_name)
             return {
-                "image": container.image.tags,
-                "hash": container.image.id,
-                "state": container.status
+                "id": container.id,
+                "labels": {key: value for key, value in container.labels.items() if "lopco" in key},
+                "status": container.status,
+                "image": {
+                    "name": container.image.tags[-1] if container.image.tags else container.image.short_id.replace("sha256:", ""),
+                    "hash": container.image.id
+                }
             }
         except Exception as ex:
             logger.error("can't get instance '{}' - {}".format(c_name, ex))
@@ -81,9 +85,13 @@ class DockerAdapter:
             deployments = dict()
             for container in container_objs:
                 deployments[container.name] = {
-                    "image": container.image.tags,
-                    "hash": container.image.id,
-                    "state": container.status
+                    "id": container.id,
+                    "labels": {key: value for key, value in container.labels.items() if "lopco" in key},
+                    "status": container.status,
+                    "image": {
+                        "name": container.image.tags[-1] if container.image.tags else container.image.short_id.replace("sha256:", ""),
+                        "hash": container.image.id
+                    }
                 }
             return deployments
         except Exception as ex:
