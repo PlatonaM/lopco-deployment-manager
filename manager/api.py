@@ -14,7 +14,7 @@
    limitations under the License.
 """
 
-__all__ = ("Workers", "Worker")
+__all__ = ("Deployments", "Deployment")
 
 
 from .logger import getLogger
@@ -33,7 +33,7 @@ def reqErrorLog(req, ex):
     logger.error("method='{}' path='{}' - {}".format(req.method, req.path, ex))
 
 
-class Workers:
+class Deployments:
     def __init__(self, docker_adapter: DockerAdapter):
         self.__docker_adapter = docker_adapter
 
@@ -61,7 +61,7 @@ class Workers:
             reqErrorLog(req, ex)
 
 
-class Worker:
+class Deployment:
     def __init__(self, docker_adapter: DockerAdapter):
         self.__docker_adapter = docker_adapter
 
