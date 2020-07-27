@@ -24,7 +24,6 @@ from .configuration import conf
 import docker
 import docker.errors
 import docker.types
-import uuid
 
 
 logger = getLogger(__name__.split(".", 1)[-1])
