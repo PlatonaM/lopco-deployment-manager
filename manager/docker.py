@@ -79,9 +79,12 @@ class DockerAdapter:
             logger.error("can't get instance '{}' - {}".format(c_name, ex))
             raise error_map.setdefault(ex, CEAdapterError)(ex)
 
-    def listContainers(self) -> dict:
+    def listContainers(self, type=None) -> dict:
         try:
-            container_objs = self.__client.containers.list(all=True)
+            if not type:
+                container_objs = self.__client.containers.list(all=True, filters={"label": "lopco-type"})
+            else:
+                container_objs = self.__client.containers.list(all=True, filters={"label": "lopco-type={}".format(type)})
             deployments = dict()
             for container in container_objs:
                 deployments[container.name] = {
