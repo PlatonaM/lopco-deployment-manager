@@ -36,6 +36,10 @@ def reqErrorLog(req, ex):
     logger.error("method='{}' path='{}' - {}".format(req.method, req.path, ex))
 
 
+class BadRequest(Exception):
+    pass
+
+
 class Deployments:
     def __init__(self, docker_adapter: DockerAdapter):
         self.__docker_adapter = docker_adapter
@@ -43,10 +47,19 @@ class Deployments:
     def on_get(self, req: falcon.request.Request, resp: falcon.response.Response):
         reqDebugLog(req)
         try:
-            items = self.__docker_adapter.listContainers()
+            if req.params:
+                if model.Deployment.type in req.params and req.params[model.Deployment.type] in model.DepTypes.__dict__.values():
+                    items = self.__docker_adapter.listContainers(req.params[model.Deployment.type])
+                else:
+                    raise BadRequest("unknown parameters or values - {}".format(req.params))
+            else:
+                items = self.__docker_adapter.listContainers()
             resp.content_type = falcon.MEDIA_JSON
             resp.body = json.dumps(items)
             resp.status = falcon.HTTP_200
+        except BadRequest as ex:
+            resp.status = falcon.HTTP_400
+            reqErrorLog(req, ex)
         except NotFound as ex:
             resp.status = falcon.HTTP_404
             reqErrorLog(req, ex)
