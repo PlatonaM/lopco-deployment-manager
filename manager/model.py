@@ -42,3 +42,4 @@ class Port:
 class DepTypes:
     worker = "worker"
     protocol_adapter = "protocol-adapter"
+    core = "core"
