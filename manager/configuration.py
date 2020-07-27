@@ -26,8 +26,8 @@ class Conf:
     @simple_env_var.section
     class Docker:
         socket = "unix://var/run/docker.sock"
-        rm_container = True
         network_name = "lopco-network"
+        disable_rm = False
 
     @simple_env_var.section
     class DataCache:
