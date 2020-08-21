@@ -79,7 +79,7 @@ class Deployments:
                     remove=not conf.Docker.disable_rm
                 )
             elif data[model.Deployment.type] == model.DepTypes.protocol_adapter:
-                resp.body = self.__docker_adapter.startContainer(name=data[model.Deployment.id], dep_data=data)
+                resp.body = self.__docker_adapter.startContainer(name=str(uuid.uuid4()), dep_data=data)
             else:
                 raise Exception("unknown deployment type '{}'".format(data[model.Deployment.type]))
             resp.status = falcon.HTTP_200
