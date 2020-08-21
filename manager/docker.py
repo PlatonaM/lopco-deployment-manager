@@ -62,6 +62,15 @@ class DockerAdapter:
         except Exception as ex:
             logger.error("can't remove images - {]".format(ex))
 
+    def __parsePortMappings(self, port_mappings: dict):
+        mapping = dict()
+        for c_port, h_ports in port_mappings.items():
+            mapping[c_port] = {
+                "host_interface": h_ports[-1]["HostIp"],
+                "host_ports": [int(h_port["HostPort"]) for h_port in h_ports] if len(h_ports) > 1 else int(h_ports[-1]["HostPort"])
+            } if h_ports else None
+        return mapping
+
     def getContainer(self, c_name):
         try:
             container = self.__client.containers.get(c_name)
@@ -72,7 +81,8 @@ class DockerAdapter:
                 "image": {
                     "name": container.image.tags[-1] if container.image.tags else container.image.short_id.replace("sha256:", ""),
                     "hash": container.image.id
-                }
+                },
+                "ports": self.__parsePortMappings(container.ports) if container.ports else None
             }
         except Exception as ex:
             logger.error("can't get instance '{}' - {}".format(c_name, ex))
@@ -93,7 +103,8 @@ class DockerAdapter:
                     "image": {
                         "name": container.image.tags[-1] if container.image.tags else container.image.short_id.replace("sha256:", ""),
                         "hash": container.image.id
-                    }
+                    },
+                    "ports": self.__parsePortMappings(container.ports) if container.ports else None
                 }
             return deployments
         except Exception as ex:
