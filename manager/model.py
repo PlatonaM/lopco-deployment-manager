@@ -34,7 +34,6 @@ class ProtocolAdapter(Deployment):
 
 
 class Port:
-    protocol = "protocol"
     host_interface = "host_interface"
     host_ports = "host_ports"
 
