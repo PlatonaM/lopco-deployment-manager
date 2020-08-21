@@ -132,7 +132,7 @@ class DockerAdapter:
             if dep_data.get(model.Worker.inputs):
                 params["environment"].update(dep_data[model.Worker.inputs])
             if dep_data.get(model.ProtocolAdapter.ports):
-                params["ports"] = {"{}/{}".format(port, val[model.Port.protocol]): (val[model.Port.host_interface], val[model.Port.host_ports]) if val.get(model.Port.host_interface) else val[model.Port.host_ports] for port, val in dep_data[model.ProtocolAdapter.ports].items()}
+                params["ports"] = {port: (val[model.Port.host_interface], val[model.Port.host_ports]) if val.get(model.Port.host_interface) else val[model.Port.host_ports] for port, val in dep_data[model.ProtocolAdapter.ports].items()}
             if restart:
                 params["restart_policy"] = {"name": "always"}
             self.__client.containers.run(**params)
