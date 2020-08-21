@@ -40,8 +40,7 @@ _Create Protocol-Adapter instance._
             "CONF_LOGGER_LEVEL": "debug"
         },
         "ports": {
-            "80": {
-                "protocol": "tcp",
+            "80/tcp": {
                 "host_interface": null,
                 "host_ports": 7000
             }
