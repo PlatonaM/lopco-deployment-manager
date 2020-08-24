@@ -51,6 +51,16 @@ error_map = {
     docker.errors.ImageNotFound: ImageNotFound
 }
 
+container_state_map = {
+    "created": "stopped",
+    "restarting": "running",
+    "running": "running",
+    "removing": "running",
+    "paused": "stopped",
+    "exited": "stopped",
+    "dead": "stopped"
+}
+
 
 class DockerAdapter:
     def __init__(self):
@@ -77,7 +87,7 @@ class DockerAdapter:
             return {
                 "id": container.id,
                 "labels": {key: value for key, value in container.labels.items() if "lopco" in key},
-                "status": container.status,
+                "status": container_state_map[container.status],
                 "image": {
                     "name": container.image.tags[-1] if container.image.tags else container.image.short_id.replace("sha256:", ""),
                     "hash": container.image.id
@@ -99,7 +109,7 @@ class DockerAdapter:
                 deployments[container.name] = {
                     "id": container.id,
                     "labels": {key: value for key, value in container.labels.items() if "lopco" in key},
-                    "status": container.status,
+                    "status": container_state_map[container.status],
                     "image": {
                         "name": container.image.tags[-1] if container.image.tags else container.image.short_id.replace("sha256:", ""),
                         "hash": container.image.id
