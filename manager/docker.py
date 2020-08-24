@@ -121,6 +121,14 @@ class DockerAdapter:
             logger.error("can't list instances - {}".format(ex))
             raise error_map.setdefault(ex, CEAdapterError)(ex)
 
+    def startContainer(self, name: str) -> None:
+        try:
+            container_obj = self.__client.containers.get(name)
+            container_obj.start()
+        except Exception as ex:
+            logger.error("can't start instance '{}' - {}".format(name, ex))
+            raise error_map.setdefault(ex, CEAdapterError)(ex)
+
     def stopContainer(self, name: str) -> None:
         try:
             container_obj = self.__client.containers.get(name)
