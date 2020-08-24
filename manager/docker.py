@@ -120,7 +120,7 @@ class DockerAdapter:
             logger.error("can't stop instance '{}' - {}".format(name, ex))
             raise error_map.setdefault(ex, CEAdapterError)(ex)
 
-    def startContainer(self, name, dep_data: dict, restart: bool = True, remove: bool = False) -> str:
+    def runContainer(self, name, dep_data: dict, restart: bool = True, remove: bool = False) -> str:
         try:
             try:
                 self.__client.images.pull(repository=dep_data[model.Deployment.image])
