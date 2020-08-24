@@ -105,6 +105,30 @@ class Deployment:
             resp.status = falcon.HTTP_500
             reqErrorLog(req, ex)
 
+    def on_patch(self, req: falcon.request.Request, resp: falcon.response.Response, deployment):
+        reqDebugLog(req)
+        if not req.content_type == falcon.MEDIA_JSON:
+            resp.status = falcon.HTTP_415
+        else:
+            try:
+                data = json.load(req.bounded_stream)
+                if data["status"] == "running":
+                    self.__docker_adapter.startContainer(deployment)
+                elif data["status"] == "stopped":
+                    self.__docker_adapter.stopContainer(deployment)
+                else:
+                    raise ValueError("unknown status '{}'".format(data["status"]))
+                resp.status = falcon.HTTP_200
+            except KeyError as ex:
+                resp.status = falcon.HTTP_400
+                reqErrorLog(req, ex)
+            except NotFound as ex:
+                resp.status = falcon.HTTP_404
+                reqErrorLog(req, ex)
+            except Exception as ex:
+                resp.status = falcon.HTTP_500
+                reqErrorLog(req, ex)
+
     def on_delete(self, req: falcon.request.Request, resp: falcon.response.Response, deployment):
         reqDebugLog(req)
         try:
