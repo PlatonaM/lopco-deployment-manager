@@ -163,7 +163,7 @@ class DockerAdapter:
             if dep_data.get(model.ProtocolAdapter.ports):
                 params["ports"] = {port: (val[model.Port.host_interface], val[model.Port.host_ports]) if val.get(model.Port.host_interface) else val[model.Port.host_ports] for port, val in dep_data[model.ProtocolAdapter.ports].items()}
             if restart:
-                params["restart_policy"] = {"name": "always"}
+                params["restart_policy"] = {"name": "unless-stopped"}
             self.__client.containers.run(**params)
             return params["name"]
         except Exception as ex:
