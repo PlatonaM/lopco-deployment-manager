@@ -186,3 +186,19 @@ class DockerAdapter:
         except Exception as ex:
             logger.error("can't get logs for {} - {}".format(c_name, ex))
             raise error_map.setdefault(ex, CEAdapterError)(ex)
+
+    def getRelative(self, c_name: str, since=None, until=None) -> str:
+        try:
+            container = self.__client.containers.get(c_name)
+            kwargs = dict()
+            if all((since, until)):
+                kwargs["since"] = since
+                kwargs["until"] = until
+            elif since:
+                kwargs["since"] = since
+            elif until:
+                kwargs["until"] = until
+            return container.logs(**kwargs).decode()
+        except Exception as ex:
+            logger.error("can't get logs for {} - {}".format(c_name, ex))
+            raise error_map.setdefault(ex, CEAdapterError)(ex)
