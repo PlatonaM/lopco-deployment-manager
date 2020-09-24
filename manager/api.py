@@ -24,6 +24,7 @@ from .configuration import conf
 import falcon
 import json
 import uuid
+import datetime
 
 
 logger = getLogger(__name__.split(".", 1)[-1])
@@ -135,6 +136,47 @@ class Deployment:
             self.__docker_adapter.stopContainer(deployment)
             self.__docker_adapter.removeContainer(deployment)
             resp.status = falcon.HTTP_200
+        except NotFound as ex:
+            resp.status = falcon.HTTP_404
+            reqErrorLog(req, ex)
+        except Exception as ex:
+            resp.status = falcon.HTTP_500
+            reqErrorLog(req, ex)
+
+
+class Log:
+    __abs_parameters = ("lines", )
+    __rel_parameters = ("since", "until")
+
+    def __init__(self, docker_adapter: DockerAdapter):
+        self.__docker_adapter = docker_adapter
+
+    def on_get(self, req: falcon.request.Request, resp: falcon.response.Response, deployment):
+        reqDebugLog(req)
+        try:
+            if req.params:
+                params = req.params.copy()
+                if set(params).issubset(self.__rel_parameters):
+                    utc_tstp_format = "%Y-%m-%dT%H:%M:%SZ"
+                    for key in params:
+                        params[key] = int(datetime.datetime.strptime(params[key], utc_tstp_format).replace(tzinfo=datetime.timezone.utc).timestamp())
+                    resp.body = self.__docker_adapter.getRelative(deployment, **params)
+                elif set(params).issubset(self.__abs_parameters):
+                    for key in params:
+                        params[key] = int(params[key])
+                    resp.body = self.__docker_adapter.getAbsolut(deployment, **params)
+                else:
+                    raise TypeError("unknown arguments")
+            else:
+                resp.body = self.__docker_adapter.getRelative(deployment)
+            resp.content_type = falcon.MEDIA_TEXT
+            resp.status = falcon.HTTP_200
+        except TypeError as ex:
+            resp.status = falcon.HTTP_400
+            reqErrorLog(req, ex)
+        except ValueError as ex:
+            resp.status = falcon.HTTP_400
+            reqErrorLog(req, ex)
         except NotFound as ex:
             resp.status = falcon.HTTP_404
             reqErrorLog(req, ex)
