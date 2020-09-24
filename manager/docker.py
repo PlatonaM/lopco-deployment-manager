@@ -178,3 +178,11 @@ class DockerAdapter:
         except Exception as ex:
             logger.error("can't remove instance '{}' - {}".format(name, ex))
             raise error_map.setdefault(ex, CEAdapterError)(ex)
+
+    def getAbsolut(self, c_name: str, lines: int) -> str:
+        try:
+            container = self.__client.containers.get(c_name)
+            return container.logs(tail=lines).decode()
+        except Exception as ex:
+            logger.error("can't get logs for {} - {}".format(c_name, ex))
+            raise error_map.setdefault(ex, CEAdapterError)(ex)
