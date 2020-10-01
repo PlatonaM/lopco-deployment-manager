@@ -19,7 +19,7 @@ __all__ = ("Deployments", "Deployment")
 
 from . import model
 from .logger import getLogger
-from .docker import DockerAdapter, NotFound
+from .docker import DockerAdapter, NotFound, CEAdapterError
 from .configuration import conf
 import falcon
 import json
@@ -134,7 +134,10 @@ class Deployment:
         reqDebugLog(req)
         try:
             self.__docker_adapter.stopContainer(deployment)
-            self.__docker_adapter.removeContainer(deployment)
+            try:
+                self.__docker_adapter.removeContainer(deployment)
+            except CEAdapterError:
+                pass
             resp.status = falcon.HTTP_200
         except NotFound as ex:
             resp.status = falcon.HTTP_404
