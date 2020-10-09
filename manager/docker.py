@@ -92,7 +92,11 @@ class DockerAdapter:
                     "name": container.image.tags[-1] if container.image.tags else container.image.short_id.replace("sha256:", ""),
                     "hash": container.image.id
                 },
-                "ports": self.__parsePortMappings(container.ports) if container.ports else None
+                "ports": self.__parsePortMappings(container.ports) if container.ports else None,
+                "created": container.attrs["Created"],
+                "started": container.attrs["State"]["StartedAt"],
+                "restarts": container.attrs["RestartCount"],
+                "environment": {key: value for key, value in [item.split("=") for item in container.attrs["Config"]["Env"]]}
             }
         except Exception as ex:
             logger.error("can't get instance '{}' - {}".format(c_name, ex))
