@@ -141,9 +141,14 @@ class DockerAdapter:
     def runContainer(self, name, dep_data: dict, restart: bool = True, remove: bool = False) -> str:
         try:
             try:
-                self.__client.images.pull(repository=dep_data[model.Deployment.image])
-            except Exception as ex:
-                logger.warning("can't pull image for '{}' - {}".format(dep_data[model.Deployment.id], ex))
+                self.__client.images.get(dep_data[model.Deployment.image])
+            except docker.errors.ImageNotFound as ex:
+                logger.warning("image not found for '{}' - {}".format(dep_data[model.Deployment.id], ex))
+                try:
+                    self.__client.images.pull(repository=dep_data[model.Deployment.image])
+                except Exception as ex:
+                    logger.error("can't pull image for '{}' - {}".format(dep_data[model.Deployment.id], ex))
+                    raise ex
             params = dict()
             params["name"] = name
             params["labels"] = {
