@@ -211,3 +211,20 @@ class DockerAdapter:
         except Exception as ex:
             logger.error("can't get logs for {} - {}".format(c_name, ex))
             raise error_map.setdefault(type(ex), CEAdapterError)(ex)
+
+    def listImages(self):
+        try:
+            image_objs = self.__client.images.list()
+            images = dict()
+            for image in image_objs:
+                if image.tags:
+                    images[image.tags[-1]] = {
+                        "hash": image.id,
+                        "created": image.attrs["Created"],
+                        "size": image.attrs["Size"],
+                        "architecture": image.attrs["Architecture"]
+                    }
+            return images
+        except Exception as ex:
+            logger.error("can't list images - {}".format(ex))
+            raise error_map.setdefault(type(ex), CEAdapterError)(ex)
