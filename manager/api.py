@@ -193,6 +193,21 @@ class Image:
             reqErrorLog(req, ex)
 
 
+class Digest:
+    def __init__(self, docker_adapter: DockerAdapter):
+        self.__docker_adapter = docker_adapter
+
+    def on_get(self, req: falcon.request.Request, resp: falcon.response.Response, image):
+        reqDebugLog(req)
+        try:
+            resp.content_type = falcon.MEDIA_JSON
+            resp.body = json.dumps(self.__docker_adapter.getRegImageDigest(falcon.uri.decode(image)))
+            resp.status = falcon.HTTP_200
+        except Exception as ex:
+            resp.status = falcon.HTTP_500
+            reqErrorLog(req, ex)
+
+
 class Log:
     __abs_parameters = ("lines", )
     __rel_parameters = ("since", "until")
