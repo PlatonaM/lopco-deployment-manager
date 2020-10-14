@@ -42,3 +42,8 @@ class DepTypes:
     worker = "worker"
     protocol_adapter = "protocol-adapter"
     core = "core"
+
+
+class Image:
+    repository = "repository"
+    tag = "tag"
