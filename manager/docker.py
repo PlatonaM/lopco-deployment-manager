@@ -241,3 +241,10 @@ class DockerAdapter:
         except Exception as ex:
             logger.error("can't get image '{}' - {}".format(image, ex))
             raise error_map.setdefault(type(ex), CEAdapterError)(ex)
+
+    def pullImage(self, repo: str, tag: str):
+        try:
+            self.__client.images.pull(repository=repo, tag=tag)
+        except Exception as ex:
+            logger.error("can't pull image '{}:{}' - {}".format(repo, tag, ex))
+            raise error_map.setdefault(type(ex), CEAdapterError)(ex)
