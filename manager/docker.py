@@ -222,7 +222,8 @@ class DockerAdapter:
                         "hash": image.id,
                         "created": image.attrs["Created"],
                         "size": image.attrs["Size"],
-                        "architecture": image.attrs["Architecture"]
+                        "architecture": image.attrs["Architecture"],
+                        "digests": image.attrs["RepoDigests"]
                     }
             return images
         except Exception as ex:
@@ -236,7 +237,8 @@ class DockerAdapter:
                 "hash": image.id,
                 "created": image.attrs["Created"],
                 "size": image.attrs["Size"],
-                "architecture": image.attrs["Architecture"]
+                "architecture": image.attrs["Architecture"],
+                "digests": image.attrs["RepoDigests"]
             }
         except Exception as ex:
             logger.error("can't get image '{}' - {}".format(image, ex))
