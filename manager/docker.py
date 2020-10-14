@@ -250,3 +250,13 @@ class DockerAdapter:
         except Exception as ex:
             logger.error("can't pull image '{}:{}' - {}".format(repo, tag, ex))
             raise error_map.setdefault(type(ex), CEAdapterError)(ex)
+
+    def getRegImageDigest(self, image: str):
+        try:
+            img_data = self.__client.images.get_registry_data(image)
+            return {
+                "digest": img_data.id
+            }
+        except Exception as ex:
+            logger.error("can't get digest for image '{}' from registry - {}".format(image, ex))
+            raise error_map.setdefault(type(ex), CEAdapterError)(ex)
