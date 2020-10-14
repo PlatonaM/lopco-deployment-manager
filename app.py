@@ -32,7 +32,9 @@ app.req_options.strip_url_path_trailing_slash = True
 routes = (
     ("/deployments", api.Deployments(docker_adapter)),
     ("/deployments/{deployment}", api.Deployment(docker_adapter)),
-    ("/deployments/{deployment}/log", api.Log(docker_adapter))
+    ("/deployments/{deployment}/log", api.Log(docker_adapter)),
+    ("/images", api.Images(docker_adapter)),
+    ("/images/{image}", api.Image(docker_adapter))
 )
 
 for route in routes:
