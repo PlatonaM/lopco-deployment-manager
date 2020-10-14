@@ -100,7 +100,7 @@ class DockerAdapter:
             }
         except Exception as ex:
             logger.error("can't get instance '{}' - {}".format(c_name, ex))
-            raise error_map.setdefault(ex, CEAdapterError)(ex)
+            raise error_map.setdefault(type(ex), CEAdapterError)(ex)
 
     def listContainers(self, type=None) -> dict:
         try:
@@ -123,7 +123,7 @@ class DockerAdapter:
             return deployments
         except Exception as ex:
             logger.error("can't list instances - {}".format(ex))
-            raise error_map.setdefault(ex, CEAdapterError)(ex)
+            raise error_map.setdefault(type(ex), CEAdapterError)(ex)
 
     def startContainer(self, name: str) -> None:
         try:
@@ -131,7 +131,7 @@ class DockerAdapter:
             container_obj.start()
         except Exception as ex:
             logger.error("can't start instance '{}' - {}".format(name, ex))
-            raise error_map.setdefault(ex, CEAdapterError)(ex)
+            raise error_map.setdefault(type(ex), CEAdapterError)(ex)
 
     def stopContainer(self, name: str) -> None:
         try:
@@ -140,7 +140,7 @@ class DockerAdapter:
             container_obj.wait()
         except Exception as ex:
             logger.error("can't stop instance '{}' - {}".format(name, ex))
-            raise error_map.setdefault(ex, CEAdapterError)(ex)
+            raise error_map.setdefault(type(ex), CEAdapterError)(ex)
 
     def runContainer(self, name, dep_data: dict, restart: bool = True, remove: bool = False) -> str:
         try:
@@ -177,7 +177,7 @@ class DockerAdapter:
             return params["name"]
         except Exception as ex:
             logger.error("can't create instance for '{}' - {}".format(dep_data[model.Deployment.id], ex))
-            raise error_map.setdefault(ex, CEAdapterError)(ex)
+            raise error_map.setdefault(type(ex), CEAdapterError)(ex)
 
     def removeContainer(self, name: str) -> None:
         try:
@@ -186,7 +186,7 @@ class DockerAdapter:
             self.__purgeImages()
         except Exception as ex:
             logger.error("can't remove instance '{}' - {}".format(name, ex))
-            raise error_map.setdefault(ex, CEAdapterError)(ex)
+            raise error_map.setdefault(type(ex), CEAdapterError)(ex)
 
     def getAbsolut(self, c_name: str, lines: int) -> str:
         try:
@@ -194,7 +194,7 @@ class DockerAdapter:
             return container.logs(tail=lines).decode()
         except Exception as ex:
             logger.error("can't get logs for {} - {}".format(c_name, ex))
-            raise error_map.setdefault(ex, CEAdapterError)(ex)
+            raise error_map.setdefault(type(ex), CEAdapterError)(ex)
 
     def getRelative(self, c_name: str, since=None, until=None) -> str:
         try:
@@ -210,4 +210,4 @@ class DockerAdapter:
             return container.logs(**kwargs).decode()
         except Exception as ex:
             logger.error("can't get logs for {} - {}".format(c_name, ex))
-            raise error_map.setdefault(ex, CEAdapterError)(ex)
+            raise error_map.setdefault(type(ex), CEAdapterError)(ex)
