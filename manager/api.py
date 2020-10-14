@@ -19,7 +19,7 @@ __all__ = ("Deployments", "Deployment")
 
 from . import model
 from .logger import getLogger
-from .docker import DockerAdapter, NotFound, CEAdapterError
+from .docker import DockerAdapter, NotFound, ImageNotFound, CEAdapterError
 from .configuration import conf
 import falcon
 import json
@@ -140,6 +140,52 @@ class Deployment:
                 pass
             resp.status = falcon.HTTP_200
         except NotFound as ex:
+            resp.status = falcon.HTTP_404
+            reqErrorLog(req, ex)
+        except Exception as ex:
+            resp.status = falcon.HTTP_500
+            reqErrorLog(req, ex)
+
+
+class Images:
+    def __init__(self, docker_adapter: DockerAdapter):
+        self.__docker_adapter = docker_adapter
+
+    def on_get(self, req: falcon.request.Request, resp: falcon.response.Response):
+        reqDebugLog(req)
+        try:
+            resp.content_type = falcon.MEDIA_JSON
+            resp.body = json.dumps(self.__docker_adapter.listImages())
+            resp.status = falcon.HTTP_200
+        except Exception as ex:
+            resp.status = falcon.HTTP_500
+            reqErrorLog(req, ex)
+
+    def on_post(self, req: falcon.request.Request, resp: falcon.response.Response):
+        reqDebugLog(req)
+        try:
+            data = json.load(req.bounded_stream)
+            self.__docker_adapter.pullImage(data[model.Image.repository], data[model.Image.tag])
+            resp.status = falcon.HTTP_200
+        except KeyError as ex:
+            resp.status = falcon.HTTP_400
+            reqErrorLog(req, ex)
+        except Exception as ex:
+            resp.status = falcon.HTTP_500
+            reqErrorLog(req, ex)
+
+
+class Image:
+    def __init__(self, docker_adapter: DockerAdapter):
+        self.__docker_adapter = docker_adapter
+
+    def on_get(self, req: falcon.request.Request, resp: falcon.response.Response, image):
+        reqDebugLog(req)
+        try:
+            resp.content_type = falcon.MEDIA_JSON
+            resp.body = json.dumps(self.__docker_adapter.getImage(falcon.uri.decode(image)))
+            resp.status = falcon.HTTP_200
+        except ImageNotFound as ex:
             resp.status = falcon.HTTP_404
             reqErrorLog(req, ex)
         except Exception as ex:
