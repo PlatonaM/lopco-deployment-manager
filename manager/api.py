@@ -73,12 +73,7 @@ class Deployments:
         try:
             data = json.load(req.bounded_stream)
             if data[model.Deployment.type] == model.DepTypes.worker:
-                resp.body = self.__docker_adapter.runContainer(
-                    name=str(uuid.uuid4()),
-                    dep_data=data,
-                    restart=False,
-                    remove=not conf.Docker.disable_rm
-                )
+                resp.body = self.__docker_adapter.runContainer(name=str(uuid.uuid4()), dep_data=data, restart=False)
             elif data[model.Deployment.type] == model.DepTypes.protocol_adapter:
                 resp.body = self.__docker_adapter.runContainer(name=str(uuid.uuid4()), dep_data=data)
             else:
