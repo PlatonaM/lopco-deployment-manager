@@ -169,6 +169,15 @@ class Images:
             resp.status = falcon.HTTP_500
             reqErrorLog(req, ex)
 
+    def on_patch(self, req: falcon.request.Request, resp: falcon.response.Response):
+        reqDebugLog(req)
+        try:
+            self.__docker_adapter.pruneImages()
+            resp.status = falcon.HTTP_200
+        except Exception as ex:
+            resp.status = falcon.HTTP_500
+            reqErrorLog(req, ex)
+
 
 class Image:
     def __init__(self, docker_adapter: DockerAdapter):
