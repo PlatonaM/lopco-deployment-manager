@@ -187,7 +187,6 @@ class DockerAdapter:
         try:
             container_obj = self.__client.containers.get(name)
             container_obj.remove()
-            self.__purgeImages()
         except Exception as ex:
             logger.error("can't remove instance '{}' - {}".format(name, ex))
             raise error_map.setdefault(type(ex), CEAdapterError)(ex)
