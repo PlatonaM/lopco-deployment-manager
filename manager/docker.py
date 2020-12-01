@@ -257,3 +257,10 @@ class DockerAdapter:
         except Exception as ex:
             logger.error("can't get digest for image '{}' from registry - {}".format(image, ex))
             raise error_map.setdefault(type(ex), CEAdapterError)(ex)
+
+    def pruneImages(self):
+        try:
+            self.__client.images.prune(filters={"dangling": True})
+        except Exception as ex:
+            logger.error("can't prune images - {]".format(ex))
+            raise error_map.setdefault(type(ex), CEAdapterError)(ex)
