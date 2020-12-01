@@ -66,12 +66,6 @@ class DockerAdapter:
     def __init__(self):
         self.__client = docker.DockerClient(base_url=conf.Docker.socket)
 
-    def __purgeImages(self):
-        try:
-            self.__client.images.prune(filters={"dangling": True})
-        except Exception as ex:
-            logger.error("can't remove images - {]".format(ex))
-
     def __parsePortMappings(self, port_mappings: dict):
         mapping = dict()
         for c_port, h_ports in port_mappings.items():
