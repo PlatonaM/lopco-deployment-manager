@@ -1,3 +1,19 @@
+## lopco-deployment-manager
+
+Wraps the local docker endpoint and provides an HTTP API for container deployment, management and logs.
+
+### Configuration
+
+`CONF_LOGGER_LEVEL`: Set logging level to `info`, `warning`, `error`, `critical` or `debug`.
+
+`CONF_DOCKER_SOCKET`: URL of the local docker socket (unix://...).
+
+`CONF_DOCKER_NETWORK_NAME`: Set name of the internal docker network.
+
+`CONF_DATACACHE_VOLUME_NAME`: Provide the name of the LOPCO data cache volume.
+
+### Data Structures
+
 #### /deployments
 
 **GET**
